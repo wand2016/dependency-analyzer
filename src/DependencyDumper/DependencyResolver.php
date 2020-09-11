@@ -181,7 +181,7 @@ class DependencyResolver
                 //   }
                 $this->resolvePropertyProperty($node, $scope);
             }
-        } catch (AnalyzedCodeException $e) {
+        } catch (AnalysedCodeException $e) {
             throw new ResolveDependencyException($node, 'resolving node dependency is failed.', 0, $e);
         } catch (ShouldNotHappenException $e) {
             throw new ResolveDependencyException($node, 'resolving node dependency is failed.', 0, $e);
@@ -588,9 +588,12 @@ class DependencyResolver
         if (!$scope->isInClass()) {
             throw new \PHPStan\ShouldNotHappenException();
         }
-        $nativeProperty = $scope->getClassReflection()->getNativeProperty($node->name->name);
+        $classReflection = $scope->getClassReflection();
+        assert($classReflection !== null, 'checked already above');
+
+        $nativeProperty = $classReflection->getNativeProperty($node->name->name);
         if ($nativeProperty instanceof PhpPropertyReflection) {
-            $type = $nativeProperty->getType();
+            $type = $nativeProperty->getReadableType();
             if ($type instanceof TypeWithClassName) {
                 $this->addDependencyWhenResolveClassReflectionIsSucceeded($type->getClassName());
             }
